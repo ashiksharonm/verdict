@@ -25,11 +25,12 @@ build-backend = "hatchling.build"
 packages = ["training/verdict_train", "evals/verdict_evals"]
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]  # long f-strings in report tables; formatting is not enforced
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
