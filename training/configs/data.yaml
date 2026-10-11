@@ -1,0 +1,19 @@
+# Split sizes per check. `pos_frac: null` keeps the source's natural class ratio.
+seed: 13
+checks:
+  pii:
+    train: {n: 8000, pos_frac: 0.5}
+    val: {n: 600, pos_frac: 0.5}
+    test: {n: 2000, pos_frac: 0.5}
+  toxicity:
+    train: {n: 8000, pos_frac: 0.5}
+    val: {n: 600, pos_frac: 0.5}
+    test: {n: 2000, pos_frac: 0.5}
+  prompt_injection:
+    train: {n: 8000, pos_frac: null}
+    val: {n: 1000, pos_frac: null}
+    test: {n: 2000, pos_frac: null}
+  grounded:
+    train: {n: 8000, pos_frac: null}
+    val: {n: 800, pos_frac: null}
+    test: {n: 1200, pos_frac: null}
