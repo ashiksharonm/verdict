@@ -1,0 +1,142 @@
+{
+  "checks": {
+    "grounded": {
+      "test": {
+        "by_source": {
+          "ragtruth-data2txt": 432,
+          "ragtruth-qa": 382,
+          "ragtruth-summary": 386
+        },
+        "n": 1200,
+        "pool": 2693,
+        "positives": 429,
+        "sha256": "c5cfea93be5dd687c208fbb8a21305c8d39fc2db1998d92c697f7cc367984c4d"
+      },
+      "train": {
+        "by_source": {
+          "ragtruth-data2txt": 2826,
+          "ragtruth-qa": 2656,
+          "ragtruth-summary": 2518
+        },
+        "n": 8000,
+        "pool": 13532,
+        "positives": 3571,
+        "sha256": "96bd00cb79d81f5e6be9df8ae91ecbfff5025ae234f5131bc1ebe1fac00496a6"
+      },
+      "val": {
+        "by_source": {
+          "ragtruth-data2txt": 295,
+          "ragtruth-qa": 268,
+          "ragtruth-summary": 237
+        },
+        "n": 800,
+        "pool": 1497,
+        "positives": 379,
+        "sha256": "3e0867772cf5cdca7188ac1395633b9e1a2aa1f5b6da3855f6646fb2eb2f9730"
+      }
+    },
+    "pii": {
+      "test": {
+        "by_source": {
+          "dolly": 357,
+          "gretel": 1000,
+          "gretel-no-pii": 12,
+          "gretel-redacted": 631
+        },
+        "n": 2000,
+        "pool": 6279,
+        "positives": 1000,
+        "sha256": "0986b371d7b5f7fdb740ed5ba9b88ffec07dbd8654a565fe023701e624c08aef"
+      },
+      "train": {
+        "by_source": {
+          "dolly": 909,
+          "gretel": 4000,
+          "gretel-no-pii": 59,
+          "gretel-redacted": 3032
+        },
+        "n": 8000,
+        "pool": 56110,
+        "positives": 4000,
+        "sha256": "ac064a6e3169ee0a6d758d936ee16166f893c03c951cf44062c093bd9d0f780b"
+      },
+      "val": {
+        "by_source": {
+          "dolly": 47,
+          "gretel": 300,
+          "gretel-no-pii": 4,
+          "gretel-redacted": 249
+        },
+        "n": 600,
+        "pool": 5376,
+        "positives": 300,
+        "sha256": "68a97ad1b9434f78d2c2c0f2082cbb0fa6265cfe27fab454410d5498ba60246a"
+      }
+    },
+    "prompt_injection": {
+      "test": {
+        "by_source": {
+          "deepset": 116,
+          "jackhhao": 236,
+          "spml": 897
+        },
+        "n": 1249,
+        "pool": 1249,
+        "positives": 891,
+        "sha256": "d6568c28e955cb11302e9e97ca765460e2eb75a9a0b86f5e4468f7745b45634f"
+      },
+      "train": {
+        "by_source": {
+          "deepset": 462,
+          "jackhhao": 822,
+          "spml": 4490
+        },
+        "n": 5774,
+        "pool": 5774,
+        "positives": 4044,
+        "sha256": "d069440e18233695896eb80c54790b9d66e0d599f1e61685e1ce8e3922c0893d"
+      },
+      "val": {
+        "by_source": {
+          "deepset": 83,
+          "jackhhao": 145,
+          "spml": 599
+        },
+        "n": 827,
+        "pool": 827,
+        "positives": 578,
+        "sha256": "4077f48a7129f2daddf115cca41fdf40b44409287a6b30a5923dd8437ca7b869"
+      }
+    },
+    "toxicity": {
+      "test": {
+        "by_source": {
+          "civil_comments": 2000
+        },
+        "n": 2000,
+        "pool": 3998,
+        "positives": 1000,
+        "sha256": "9ac8b6be09640c42cb2c0d4a8a01e2208b78cffa567e694e982c5a80251f551e"
+      },
+      "train": {
+        "by_source": {
+          "civil_comments": 8000
+        },
+        "n": 8000,
+        "pool": 10792,
+        "positives": 4000,
+        "sha256": "1e33dc55c27bf7ed1a90a3fc43380c290365e31fe9c2cdfedd9488b3826c5191"
+      },
+      "val": {
+        "by_source": {
+          "civil_comments": 600
+        },
+        "n": 600,
+        "pool": 1199,
+        "positives": 300,
+        "sha256": "c8c1116e6950c41ac59464b929137243918fd8f8f222e16af4ba45b73adc4020"
+      }
+    }
+  },
+  "seed": 13
+}
