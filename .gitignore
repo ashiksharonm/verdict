@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+# large/generated artifacts stay local
+data/processed/
+data/raw/
+artifacts/
+*.safetensors
+*.onnx
+*.onnx.data
+logs/
+*.log
+node_modules/
+.next/
