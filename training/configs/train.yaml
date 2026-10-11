@@ -1,0 +1,22 @@
+# Multi-check Laya fine-tune on Apple M5 (16 GB, MPS). Sizes were cut to fit a ~4 h budget;
+# see training/README.md for the measured step time this is based on.
+base: convaiinnovations/laya          # English checkpoint (ModernBERT-large + decision head)
+data_dir: data/processed
+out_dir: artifacts/verdict-laya
+seed: 13
+train_per_check:                      # subsample of each check's train split (0 = all)
+  pii: 2500
+  toxicity: 2500
+  prompt_injection: 2500
+  grounded: 2500
+max_len: 512
+laya:                                 # laya.train.TrainConfig fields
+  epochs: 1
+  micro_batch: 8
+  grad_accum: 4
+  encoder_lr: 2.5e-5
+  head_lr: 1.0e-4
+  loss: soft-ce                       # laya's docs report no gain from rlcd on typed decisions (#741)
+  gradient_checkpointing: true
+  calib_max: 400
+  log_every: 25
