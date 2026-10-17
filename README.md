@@ -18,9 +18,9 @@ Status: work in progress. Training and benchmark code land first; the API, web a
 ```
 training/   data prep per check, Laya fine-tune, calibration, ONNX int8 export
 evals/      benchmark harness (`make bench`), dataset licences, committed results
-api/        FastAPI service (planned)
+api/        FastAPI service (docs/API.md; Docker Space deploy via scripts/deploy_space.py)
 web/        Next.js site: landing, playground, docs, benchmarks, dashboard (see web/README.md)
-sdk/python/ Python client (planned)
+sdk/python/ Python client `verdict-sdk` (sync + async, retries, CI gate; not on PyPI)
 docs/       use cases and design notes
 ```
 
