@@ -19,7 +19,7 @@ Status: work in progress. Training and benchmark code land first; the API, web a
 training/   data prep per check, Laya fine-tune, calibration, ONNX int8 export
 evals/      benchmark harness (`make bench`), dataset licences, committed results
 api/        FastAPI service (planned)
-web/        Next.js site (planned)
+web/        Next.js site: landing, playground, docs, benchmarks, dashboard (see web/README.md)
 sdk/python/ Python client (planned)
 docs/       use cases and design notes
 ```
