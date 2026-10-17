@@ -9,9 +9,9 @@ export const curlCheck = (key = "$VERDICT_API_KEY") => `curl -s ${API_URL}/v1/ch
   -H "Content-Type: application/json" \\
   -d '{"text": "Call me on +44 7700 900123", "checks": ["pii", "toxicity"]}'`;
 
-export const pythonCheck = `from verdict import Verdict
+export const pythonCheck = `from verdict import Client
 
-client = Verdict(api_key="vd_...")  # or set VERDICT_API_KEY
+client = Client(api_key="vk_...")  # or set VERDICT_API_KEY
 res = client.check("Call me on +44 7700 900123", checks=["pii", "toxicity"])
 if res.results["pii"].flagged:
     ...  # mask or block`;

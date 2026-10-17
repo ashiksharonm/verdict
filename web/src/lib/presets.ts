@@ -52,7 +52,7 @@ export const PRESETS: Preset[] = [
     text: "Your refund was approved. The customer, John Miller (john.miller@example.com), will see it in 3-5 business days.",
     context: "Refund policy: refunds are issued to the original payment method within 5-10 business days.",
     checks: ["pii", "grounded"],
-    decision: "assert_checks(results, max_rate={\"pii\": 0, \"grounded_fail\": 0.05}) fails the build.",
+    decision: "assert_checks(results, max_rate={\"pii\": 0, \"grounded\": 0.05}) fails the build (for grounded, flagged = not supported by the context).",
   },
   {
     id: "cheap-prefilter",
