@@ -1,0 +1,37 @@
+{
+  "name": "verdict-web",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "prebuild": "node scripts/prebuild.mjs",
+    "predev": "node scripts/prebuild.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "pretypecheck": "node scripts/prebuild.mjs",
+    "typecheck": "tsc --noEmit",
+    "pretest": "node scripts/prebuild.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.2",
+    "next": "15.5.27",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.3.7",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "25.9.9",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "15.5.27",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}
