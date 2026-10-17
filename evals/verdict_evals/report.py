@@ -51,6 +51,8 @@ def check_tables(res: dict) -> list[str]:
                 "| recall@1%FPR | recall@5%FPR |",
                 "|---|---|---|---|---|---|---|---|---|---|"]
         for entry in res["systems"].values():
+            if entry.get("latency_only"):
+                continue
             m = entry.get("checks", {}).get(c)
             if not m:
                 continue
@@ -67,7 +69,7 @@ def source_tables(res: dict) -> list[str]:
     out = []
     for c in ("prompt_injection", "grounded"):
         rows = [(e["name"], e["checks"][c]["by_source"]) for e in res["systems"].values()
-                if c in e.get("checks", {}) and "by_source" in e["checks"][c]]
+                if not e.get("latency_only") and c in e["checks"] and "by_source" in e["checks"][c]]
         if not rows:
             continue
         sources = sorted({s for _, b in rows for s in b})

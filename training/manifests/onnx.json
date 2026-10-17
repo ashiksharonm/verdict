@@ -1,0 +1,79 @@
+{
+  "parity_split": "val",
+  "cpu": "arm",
+  "ort_threads": 10,
+  "variants": {
+    "onnx_fp32": {
+      "size_mb": 1686.1,
+      "checks": {
+        "pii": {
+          "n": 600,
+          "decision_agreement": 1.0,
+          "max_abs_diff": 2.872215110361065e-06,
+          "mean_abs_diff": 4.032540666584696e-08
+        },
+        "toxicity": {
+          "n": 600,
+          "decision_agreement": 1.0,
+          "max_abs_diff": 3.748521694824092e-06,
+          "mean_abs_diff": 2.4418848023253337e-07
+        },
+        "prompt_injection": {
+          "n": 827,
+          "decision_agreement": 1.0,
+          "max_abs_diff": 4.7201598836199565e-06,
+          "mean_abs_diff": 8.616206701621241e-08
+        },
+        "grounded": {
+          "n": 800,
+          "decision_agreement": 1.0,
+          "max_abs_diff": 5.095176154767955e-06,
+          "mean_abs_diff": 3.30942811060525e-07
+        }
+      },
+      "latency_batch1": {
+        "calls": 200,
+        "batch_size": 1,
+        "p50_ms": 325.94324999081437,
+        "p95_ms": 1088.0243184488786,
+        "throughput_per_s": 2.00139722626378
+      }
+    },
+    "onnx_int8": {
+      "size_mb": 443.3,
+      "checks": {
+        "pii": {
+          "n": 600,
+          "decision_agreement": 1.0,
+          "max_abs_diff": 0.1130300980978729,
+          "mean_abs_diff": 0.0011678696029840086
+        },
+        "toxicity": {
+          "n": 600,
+          "decision_agreement": 0.9916666666666667,
+          "max_abs_diff": 0.11940880837106785,
+          "mean_abs_diff": 0.00796295284282767
+        },
+        "prompt_injection": {
+          "n": 827,
+          "decision_agreement": 1.0,
+          "max_abs_diff": 0.11956581000963218,
+          "mean_abs_diff": 0.002512347490727641
+        },
+        "grounded": {
+          "n": 800,
+          "decision_agreement": 0.99375,
+          "max_abs_diff": 0.07406067218029733,
+          "mean_abs_diff": 0.006718857098422026
+        }
+      },
+      "latency_batch1": {
+        "calls": 200,
+        "batch_size": 1,
+        "p50_ms": 151.9101249941741,
+        "p95_ms": 611.9774701968707,
+        "throughput_per_s": 3.516249637942333
+      }
+    }
+  }
+}
