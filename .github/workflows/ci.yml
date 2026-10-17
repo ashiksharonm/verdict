@@ -15,8 +15,8 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install (no torch, no model downloads)
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,api]"
       - name: Lint
         run: ruff check .
-      - name: Tests (data utils, metrics, fixture smoke eval)
+      - name: Tests (data utils, metrics, smoke eval, API and SDK with mocked services)
         run: pytest -q

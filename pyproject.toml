@@ -15,7 +15,8 @@ dependencies = [
 data = ["datasets>=3", "pandas>=2", "pyarrow>=15"]
 train = ["laya[onnx]==0.4.2", "torch>=2.4", "transformers>=4.48", "onnx", "onnxruntime>=1.18"]
 bench = ["presidio-analyzer>=2.2", "transformers>=4.48", "torch>=2.4", "onnxruntime>=1.18"]
-dev = ["ruff>=0.6", "pytest>=8"]
+api = ["fastapi>=0.115", "httpx>=0.27", "prometheus-client>=0.20", "pydantic>=2.7"]
+dev = ["ruff>=0.6", "pytest>=8", "pytest-asyncio>=0.23"]
 
 [build-system]
 requires = ["hatchling"]
@@ -33,4 +34,6 @@ select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]  # long f-strings in report tables; formatting is not enforced
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "api/tests", "sdk/python/tests"]
+pythonpath = ["api", "training", "evals", "sdk/python"]
+asyncio_mode = "auto"
