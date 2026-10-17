@@ -14,6 +14,7 @@ import urllib.request
 from pathlib import Path
 
 from huggingface_hub import HfApi
+from huggingface_hub.errors import HfHubHTTPError
 
 SPACE_ID = os.environ.get("SPACE_ID", "ashiksharon005/verdict-api")
 SECRETS = ["HF_TOKEN", "SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY",
@@ -47,7 +48,14 @@ def probe(url: str) -> int:
 def main() -> int:
     token = os.environ["HF_TOKEN"]
     api = HfApi(token=token)
-    api.create_repo(SPACE_ID, repo_type="space", space_sdk="docker", exist_ok=True, private=False)
+    try:
+        api.create_repo(SPACE_ID, repo_type="space", space_sdk="docker", exist_ok=True, private=False)
+    except HfHubHTTPError as e:
+        if e.response is not None and e.response.status_code == 402:
+            msg = "Hugging Face requires a PRO subscription for Docker Spaces on free cpu-basic (HTTP 402)"
+            print(f"::warning::{msg}")
+            return 0 if os.environ.get("GITHUB_EVENT_NAME") == "push" else 1  # do not redden every push
+        raise
     for name in SECRETS:
         if os.environ.get(name):
             api.add_space_secret(SPACE_ID, name, os.environ[name])
