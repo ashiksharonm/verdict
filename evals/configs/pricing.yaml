@@ -1,0 +1,16 @@
+# Reference LLM-API list prices, used only to put self-hosted cost in context.
+# Token counts per check come from the judge prompts in the benchmark (Qwen tokenizer, so they are
+# an approximation for other tokenizers). One output token per check (constrained yes/no).
+references:
+  - name: OpenAI gpt-4o-mini
+    input_per_mtok: 0.15
+    output_per_mtok: 0.60
+    output_tokens: 1
+    source: developers.openai.com/api/docs/pricing (standard tier)
+    as_of: 2026-10-11
+  - name: OpenAI gpt-4.1-mini
+    input_per_mtok: 0.40
+    output_per_mtok: 1.60
+    output_tokens: 1
+    source: developers.openai.com/api/docs/pricing (standard tier)
+    as_of: 2026-10-11

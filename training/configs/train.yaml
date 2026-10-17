@@ -12,8 +12,8 @@ train_per_check:                      # subsample of each check's train split (0
 max_len: 512
 laya:                                 # laya.train.TrainConfig fields
   epochs: 1
-  micro_batch: 8
-  grad_accum: 4
+  micro_batch: 4
+  grad_accum: 8
   encoder_lr: 2.5e-5
   head_lr: 1.0e-4
   loss: soft-ce                       # laya's docs report no gain from rlcd on typed decisions (#741)
