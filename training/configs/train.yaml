@@ -19,4 +19,5 @@ laya:                                 # laya.train.TrainConfig fields
   loss: soft-ce                       # laya's docs report no gain from rlcd on typed decisions (#741)
   gradient_checkpointing: true
   calib_max: 400
-  log_every: 25
+  log_every: 50
+

@@ -38,6 +38,59 @@ def build_files(cfg: dict) -> tuple[Path, Path, dict]:
     return train_path, val_path, {"per_check": counts, **hashes}
 
 
+def release_mps_cache_each_update(log_every: int = 25) -> None:
+    """Empty the MPS allocator cache after every optimizer update.
+
+    Batches have different sequence lengths, so on Apple GPUs the cached blocks fragment and
+    "other allocations" grow until a 16 GB machine runs out of memory mid-epoch. Laya's trainer
+    has no hook for this, so it goes on the global optimizer step.
+    """
+    import torch
+    from torch.optim.optimizer import register_optimizer_step_post_hook
+
+    if not torch.backends.mps.is_available():
+        return
+    updates = 0
+
+    def hook(_optimizer, _args, _kwargs):
+        nonlocal updates
+        updates += 1
+        torch.mps.empty_cache()
+        if log_every and updates % log_every == 0:
+            print(f"update {updates}: mps allocated {torch.mps.current_allocated_memory() / 2**30:.2f} GiB, "
+                  f"driver {torch.mps.driver_allocated_memory() / 2**30:.2f} GiB", flush=True)
+
+    register_optimizer_step_post_hook(hook)
+
+
+def pad_batches_to_buckets(multiple: int = 64) -> None:
+    """Pad every training batch's sequence length up to a multiple of `multiple`.
+
+    MPS keeps a compiled graph per input shape, so with free-length batches driver memory still
+    grows ~1 GiB per 25 updates even with the cache emptied. Buckets cap it at max_len/multiple
+    shapes. Extra positions are padding with attention 0, so the model output is unchanged.
+    """
+    import laya.train as lt
+    import torch
+
+    collate = lt.collate_items
+
+    def bucketed(batch, pad_id):
+        res = collate(batch, pad_id)
+        if res is None:
+            return res
+        n, length = res["input_ids"].shape
+        extra = -length % multiple
+        if extra:
+            fill = {"input_ids": pad_id, "attention_mask": 0, "position_ids": 0, "option_ids": 0}
+            for key, value in fill.items():
+                if key in res:
+                    res[key] = torch.cat([res[key], torch.full((n, extra), value, dtype=res[key].dtype)], dim=1)
+        return res
+
+    lt.collate_items = bucketed
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--config", default="training/configs/train.yaml")
@@ -54,6 +107,8 @@ def main() -> None:
     if args.dry_run:
         print(json.dumps(dry_run(str(train_path), base, tc), indent=2, default=str))
         return
+    release_mps_cache_each_update()
+    pad_batches_to_buckets()
     t0 = time.time()
     summary = finetune(str(train_path), base, cfg["out_dir"], tc, device=args.device)
     summary = {"base": cfg["base"], "data": data_info, "wall_hours": round((time.time() - t0) / 3600, 3),
