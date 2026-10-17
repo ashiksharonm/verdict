@@ -4,3 +4,10 @@ httpx>=0.27
 prometheus-client>=0.20
 sentry-sdk>=2
 pydantic>=2.7
+# inference stack, versions the benchmark and the API tests were run with (torch comes from the CPU index in the Dockerfile)
+laya==0.4.2
+transformers==5.19.0
+onnxruntime==1.31.0
+safetensors>=0.4
+huggingface_hub>=0.24
+numpy>=1.26
