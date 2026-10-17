@@ -24,12 +24,26 @@ def sigmoid(x: np.ndarray) -> np.ndarray:
     return 1.0 / (1.0 + np.exp(-x))
 
 
+def _load_tokenizer_and_config(model_dir: str):
+    """The tokenizer and `rl_agent_config.json` exactly as `laya.train.load_checkpoint` reads them."""
+    from laya.agent import _fix_tokenizer_config
+    from transformers import AutoTokenizer
+
+    _fix_tokenizer_config(model_dir)
+    cfg = json.loads((Path(model_dir) / "rl_agent_config.json").read_text(encoding="utf-8"))
+    return AutoTokenizer.from_pretrained(str(Path(model_dir) / "tokenizer")), cfg
+
+
 class _Base:
-    def __init__(self, model_dir: str, max_len: int | None = None):
+    def __init__(self, model_dir: str, max_len: int | None = None, load_weights: bool = True):
         from laya.train import load_checkpoint, resolve_checkpoint_dir
 
         self.model_dir = resolve_checkpoint_dir(model_dir)
-        self._model, self.tok, self.cfg = load_checkpoint(self.model_dir)
+        if load_weights:
+            self._model, self.tok, self.cfg = load_checkpoint(self.model_dir)
+        else:  # tokenizer + config only: what the ONNX path needs, without the 840 MB safetensors
+            self._model = None
+            self.tok, self.cfg = _load_tokenizer_and_config(self.model_dir)
         self.max_len = int(max_len or self.cfg.get("max_len", 512))
         self.head_max_len = int(self.cfg.get("head_max_len", 192))
         temps = self.cfg.get("temperature") or [1.0, 1.0, 1.0]
@@ -114,11 +128,12 @@ class TorchScorer(_Base):
 
 
 class OnnxScorer(_Base):
-    def __init__(self, model_dir: str, onnx_path: str, max_len: int | None = None, threads: int | None = None):
+    def __init__(self, model_dir: str, onnx_path: str, max_len: int | None = None, threads: int | None = None,
+                 load_weights: bool = True):
         import onnxruntime as ort
 
-        super().__init__(model_dir, max_len)
-        del self._model  # weights only needed for the tokenizer/config path
+        super().__init__(model_dir, max_len, load_weights=load_weights)
+        del self._model
         so = ort.SessionOptions()
         so.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
         if threads:
