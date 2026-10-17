@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml
 
-from .data import BUILDERS
+from .data import builder
 from .data.common import SPLITS, balanced_sample, finalize_splits, split_stats, write_jsonl
 
 
@@ -24,7 +24,7 @@ def prepare(config: dict, out: Path, checks: list[str] | None = None) -> dict:
     for check, sizes in config["checks"].items():
         if checks and check not in checks:
             continue
-        raw = BUILDERS[check].build(seed)
+        raw = builder(check).build(seed)
         pools = finalize_splits(raw)
         entry = {}
         for split in SPLITS:
