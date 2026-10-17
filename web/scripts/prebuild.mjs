@@ -24,7 +24,17 @@ if (dirs.length === 0) {
 }
 const latest = dirs[dirs.length - 1];
 cpSync(join(resultsRoot, latest, "results.json"), join(out, "results.json"));
-cpSync(join(repo, "evals", "DATASETS.md"), join(out, "DATASETS.md"));
+const datasets = [];
+for (const line of readFileSync(join(repo, "evals", "DATASETS.md"), "utf8").split("\n")) {
+  if (!line.startsWith("| `")) continue;
+  const c = line.split("|").slice(1, -1).map((x) => x.trim().replace(/`/g, ""));
+  if (c.length === 4 && !/^\d/.test(c[1])) datasets.push({ check: c[0], source: c[1], licence: c[2], usedFor: c[3] });
+}
+if (datasets.length === 0) {
+  console.error("prebuild: could not parse the dataset table in evals/DATASETS.md");
+  process.exit(1);
+}
+writeFileSync(join(out, "datasets.json"), JSON.stringify(datasets, null, 2));
 
 // pricing.yaml is a flat list of references; parse it without a YAML dependency.
 const refs = [];
