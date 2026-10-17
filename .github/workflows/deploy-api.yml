@@ -1,0 +1,35 @@
+name: deploy-api
+
+on:
+  push:
+    branches: [main]
+    paths: ["api/**", "training/verdict_train/scoring.py", "training/verdict_train/checks.py", "scripts/deploy_space.py"]
+  workflow_dispatch:
+
+concurrency: deploy-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Deploy Space and wait for /readyz
+        if: env.HF_TOKEN != ''
+        run: |
+          pip install -q huggingface_hub
+          python scripts/deploy_space.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+      - name: Skipped
+        if: env.HF_TOKEN == ''
+        run: echo "HF_TOKEN not set; nothing deployed"
