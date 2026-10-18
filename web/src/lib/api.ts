@@ -121,6 +121,15 @@ export type ApiKey = { id: string; prefix: string; name: string; created_at: str
 export type NewApiKey = ApiKey & { key: string };
 export type Usage = { days: { day: string; count: number }[]; month_total: number; monthly_quota: number };
 
+/** GET /v1/usage returns the monthly limit as `quota`; normalise so the dashboard never reads undefined. */
+export function normaliseUsage(raw: Partial<Usage> & { quota?: number }): Usage {
+  return {
+    days: Array.isArray(raw.days) ? raw.days : [],
+    month_total: Number(raw.month_total ?? 0),
+    monthly_quota: Number(raw.monthly_quota ?? raw.quota ?? 0),
+  };
+}
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -140,4 +149,4 @@ async function authed<T>(path: string, token: string, init: RequestInit = {}, fe
 export const listKeys = (token: string) => authed<ApiKey[] | { keys: ApiKey[] }>("/v1/keys", token).then((r) => (Array.isArray(r) ? r : r.keys ?? []));
 export const createKey = (token: string, name: string) => authed<NewApiKey>("/v1/keys", token, { method: "POST", body: JSON.stringify({ name }) });
 export const revokeKey = (token: string, id: string) => authed<void>(`/v1/keys/${encodeURIComponent(id)}`, token, { method: "DELETE" });
-export const getUsage = (token: string) => authed<Usage>("/v1/usage", token);
+export const getUsage = (token: string) => authed<Partial<Usage> & { quota?: number }>("/v1/usage", token).then(normaliseUsage);

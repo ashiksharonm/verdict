@@ -130,7 +130,7 @@ export default function Page() {
       <Code>{`POST /v1/keys   {"name": "ci"}  ->  {"id", "key", "prefix", "name", "created_at"}   # key shown once
 GET  /v1/keys
 DELETE /v1/keys/{id}
-GET  /v1/usage  ->  {"days": [{"day": "2026-10-17", "count": 12}], "month_total": 12, "monthly_quota": ...}`}</Code>
+GET  /v1/usage  ->  {"days": [{"day": "2026-10-17", "count": 12}], "month_total": 12, "quota": 10000, "keys": [...]}`}</Code>
 
       <h3>Rate limits and errors</h3>
       <p>

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabaseConfigured } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
 
@@ -7,13 +7,15 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  // Read ?error= after mount: reading it during render differs between server and client (hydration error).
+  const [authError, setAuthError] = useState(false);
+  useEffect(() => setAuthError(Boolean(new URLSearchParams(window.location.search).get("error"))), []);
   const supabase = getSupabase();
 
   if (!supabaseConfigured || !supabase) {
     return <p role="alert" className="rounded-lg border border-warn p-3">Sign-in is not configured: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.</p>;
   }
   const redirectTo = () => `${window.location.origin}/auth/callback`;
-  const authError = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("error");
 
   return (
     <div className="space-y-5">
