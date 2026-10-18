@@ -55,7 +55,7 @@ jobs:
       - name: Wait for the model to load
         if: steps.gate.outputs.run == 'true'
         run: |
-          url=$(grep -oE 'https://[a-z0-9-]+--verdict-api\.modal\.run' deploy.log | head -1)
+          url=$(grep -oE 'https://[a-z0-9-]+--verdict-api(\.[a-z0-9-]+)?\.modal\.run' deploy.log | head -1)
           [ -n "$url" ] || { echo "could not find the endpoint URL in the deploy log"; exit 1; }
           echo "API: $url" >> "$GITHUB_STEP_SUMMARY"
           start=$(date +%s)
