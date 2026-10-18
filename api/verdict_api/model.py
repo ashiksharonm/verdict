@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import threading
 import time
 from dataclasses import dataclass
@@ -46,7 +47,10 @@ class ModelService:
                 model_dir = snapshot_download(s.model_repo, allow_patterns=HUB_PATTERNS)
                 rev = Path(model_dir).name[:8]
             onnx = s.onnx_path or str(Path(model_dir) / "onnx" / "model.int8.onnx")
-            self._scorer = OnnxScorer(model_dir, onnx, max_len=s.max_len, load_weights=False)
+            # Pin ONNX Runtime's thread pool to the container's CPU allowance: by default it sizes the
+            # pool from the host's cores, which oversubscribes a 2-vCPU container many times over.
+            threads = int(os.environ.get("VERDICT_ORT_THREADS") or os.environ.get("OMP_NUM_THREADS") or 0) or None
+            self._scorer = OnnxScorer(model_dir, onnx, max_len=s.max_len, load_weights=False, threads=threads)
             self.version = f"{s.model_repo.split('/')[-1]}@{rev}-int8"
             self.score_sync([("pii", "warm up", None)])
             self.load_seconds = time.perf_counter() - t0
