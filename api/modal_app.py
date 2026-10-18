@@ -53,7 +53,7 @@ app = modal.App("verdict-api")
     memory=2048,
     min_containers=0,  # scale to zero when idle; the first request after that is a cold start
     max_containers=2,  # hard cap on spend
-    scaledown_window=300,
+    scaledown_window=120,  # short idle window: the free tier is $1/month without a card
     timeout=60,
 )
 @modal.concurrent(max_inputs=16)
