@@ -11,7 +11,7 @@ export default function ResultsTable({ compact = false }: { compact?: boolean })
       <table className="tbl">
         <caption>
           Macro-F1 / AUROC on held-out test sets (n = {CHECKS.map((c) => `${results.test_sizes[c].toLocaleString("en-US")} ${c}`).join(", ")}). Dashes: system does not cover that check. LLM judge scored on a {results.llm_judge_n_per_check}-item subsample per check.{" "}
-          {compact && <Link href="/benchmarks" className="underline">Full tables</Link>}
+          {compact && <Link href="/benchmarks" className="link">Full tables</Link>}
         </caption>
         <thead>
           <tr>

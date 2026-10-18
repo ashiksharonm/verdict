@@ -1,4 +1,5 @@
 "use client";
+import { Moon, Sun } from "lucide-react";
 import { useState } from "react";
 
 type Theme = "light" | "dark";
@@ -16,10 +17,13 @@ export default function ThemeToggle() {
     <button
       type="button"
       aria-label={`Switch to ${shown === "dark" ? "light" : "dark"} theme`}
-      className="rounded-md border border-border px-2.5 py-1 text-sm hover:bg-code"
+      className="btn btn-ghost !p-2.5"
       onClick={() => {
         const next: Theme = (theme ?? current()) === "dark" ? "light" : "dark";
-        document.documentElement.dataset.theme = next;
+        const root = document.documentElement;
+        root.classList.add("theme-anim");
+        root.dataset.theme = next;
+        setTimeout(() => root.classList.remove("theme-anim"), 350);
         try {
           localStorage.setItem("theme", next);
         } catch {}
@@ -27,7 +31,9 @@ export default function ThemeToggle() {
       }}
       suppressHydrationWarning
     >
-      {theme === null ? "Theme" : theme === "dark" ? "Light" : "Dark"}
+      {/* Both icons render; CSS shows the one for the active theme so there is no flash or hydration mismatch. */}
+      <Sun aria-hidden className="theme-sun size-4" />
+      <Moon aria-hidden className="theme-moon size-4" />
     </button>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import DocLayout from "@/components/DocLayout";
 import Code from "@/components/Code";
 import { API_URL, CHECKS, CHECK_INFO } from "@/lib/config";
 import { PRESETS } from "@/lib/presets";
@@ -91,14 +92,27 @@ print(f"pii rate {pii:.2%}, ungrounded rate {ungrounded:.2%}")
 if pii > 0 or ungrounded > 0.05:
     sys.exit(1)`;
 
+const TOC = [
+  { id: "checks", label: "Checks" },
+  { id: "api", label: "API reference" },
+  { id: "quickstart", label: "Quickstart" },
+  { id: "use-cases", label: "Use-case guides" },
+  ...PRESETS.map((p) => ({ id: p.id, label: p.title, sub: true })),
+  { id: "ci-gate", label: "CI gate example" },
+];
+
 export default function Page() {
   return (
-    <div className="prose-v max-w-3xl">
-      <h1 className="text-3xl font-bold">Docs</h1>
-      <p>
-        API base URL: <code>{API_URL}</code>. Authenticated endpoints take <code>Authorization: Bearer &lt;token&gt;</code>: an API key for <code>/v1/check</code>, a Supabase access token for key management.
-      </p>
-
+    <DocLayout
+      eyebrow="Documentation"
+      title="Call the checks from your app"
+      toc={TOC}
+      intro={
+        <>
+          API base URL: <code>{API_URL}</code>. Authenticated endpoints take <code>Authorization: Bearer &lt;token&gt;</code>: an API key for <code>/v1/check</code>, a Supabase access token for key management.
+        </>
+      }
+    >
       <h2 id="checks">Checks</h2>
       <ul>
         {CHECKS.map((c) => (
@@ -108,7 +122,7 @@ export default function Page() {
       <p>For <code>flagged</code>: <code>pii</code>, <code>toxicity</code> and <code>prompt_injection</code> flag when the text matches; <code>grounded</code> flags when the response is <em>not</em> supported by the context.</p>
 
       <h2 id="api">API reference</h2>
-      <div className="tbl-wrap not-prose">
+      <div className="tbl-wrap">
         <table className="tbl">
           <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
           <tbody>
@@ -160,6 +174,6 @@ GET  /v1/usage  ->  {"days": [{"day": "2026-10-17", "count": 12}], "month_total"
       <h2 id="ci-gate">CI gate example</h2>
       <p>Run a golden set through the app and fail the pull request when PII or ungrounded answers go up. This version uses only the Python standard library against the HTTP API.</p>
       <Code>{ciGate}</Code>
-    </div>
+    </DocLayout>
   );
 }

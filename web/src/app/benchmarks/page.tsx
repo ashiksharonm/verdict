@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
 import BarList from "@/components/BarList";
+import DocLayout from "@/components/DocLayout";
 import ResultsTable from "@/components/ResultsTable";
 import { CHECKS, CHECK_INFO } from "@/lib/config";
 import { parseDatasetTable } from "@/lib/datasets";
 import { FEATURED, aggregateThroughput, costPerMillion, f1, f3, resultsDir, results, scoredSystems } from "@/lib/results";
 
 export const metadata: Metadata = { title: "Benchmarks" };
+
+const TOC = [
+  { id: "summary", label: "Summary" },
+  { id: "per-check", label: "Per-check metrics" },
+  ...CHECKS.map((c) => ({ id: `h-${c}`, label: c, sub: true })),
+  { id: "robustness", label: "Injection robustness" },
+  { id: "latency", label: "Latency and throughput" },
+  { id: "judge", label: "Verdict vs an LLM judge" },
+  { id: "cost", label: "Cost per 1M checks" },
+  { id: "methodology", label: "Methodology and licences" },
+];
 
 const ROBUST = ["leetspeak", "homoglyphs", "zero_width", "random_case", "base64"];
 
@@ -16,12 +28,16 @@ export default function Page() {
   const lat = Object.entries(results.systems).filter(([, s]) => s.latency_batch1);
   const env = results.environment;
   return (
-    <div className="prose-v max-w-4xl">
-      <h1 className="text-3xl font-bold">Benchmarks</h1>
-      <p>
-        Every number on this page is read from the committed <code>evals/results/{resultsDir}/results.json</code> at build time. Hardware: {env.machine} ({env.platform}); device column shows where each system ran. Intervals are {results.n_boot}-resample bootstrap 95% CIs. Verdict uses per-check thresholds fitted on a validation split; other systems use their natural rule.
-      </p>
-
+    <DocLayout
+      eyebrow="Benchmarks"
+      title="Held-out results, every number from the committed run"
+      toc={TOC}
+      intro={
+        <>
+          Every number on this page is read from the committed <code>evals/results/{resultsDir}/results.json</code> at build time. Hardware: {env.machine} ({env.platform}); the device column shows where each system ran. Intervals are {results.n_boot}-resample bootstrap 95% CIs. Verdict uses per-check thresholds fitted on a validation split; other systems use their natural rule.
+        </>
+      }
+    >
       <h2 id="summary">Summary (macro-F1 / AUROC)</h2>
       <ResultsTable />
 
@@ -164,7 +180,7 @@ export default function Page() {
           </tbody>
         </table>
       </div>
-    </div>
+    </DocLayout>
   );
 }
 

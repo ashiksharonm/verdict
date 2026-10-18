@@ -1,8 +1,10 @@
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import MobileNav from "./MobileNav";
 import ThemeToggle from "./ThemeToggle";
 import { REPO_URL } from "@/lib/config";
 
-const links = [
+export const NAV_LINKS = [
   ["/playground", "Playground"],
   ["/docs", "Docs"],
   ["/benchmarks", "Benchmarks"],
@@ -11,21 +13,31 @@ const links = [
 
 export default function Nav() {
   return (
-    <header className="border-b border-border">
-      <nav aria-label="Main" className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3">
-        <Link href="/" className="mr-2 text-lg font-bold tracking-tight">
-          Verdict
+    <header className="sticky top-0 z-30 border-b border-border bg-bg/90 backdrop-blur">
+      <nav aria-label="Main" className="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-4 px-4 py-3 sm:px-6 md:grid-cols-[1fr_auto_1fr]">
+        <Link href="/" className="text-xl font-medium tracking-tight">
+          Verdict<span className="text-accent">.</span>
         </Link>
-        {links.map(([href, label]) => (
-          <Link key={href} href={href} className="text-sm text-muted hover:text-fg">
-            {label}
-          </Link>
-        ))}
-        <a href={REPO_URL} className="text-sm text-muted hover:text-fg">
-          GitHub
-        </a>
-        <div className="ml-auto">
+        <ul className="hidden items-center gap-x-7 md:flex">
+          {NAV_LINKS.map(([href, label]) => (
+            <li key={href}>
+              <Link href={href} className="whitespace-nowrap text-sm text-muted transition-colors hover:text-ink">
+                {label}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <a href={REPO_URL} className="inline-flex items-center gap-0.5 whitespace-nowrap text-sm text-muted transition-colors hover:text-ink">
+              GitHub <ArrowUpRight aria-hidden className="size-3.5" />
+            </a>
+          </li>
+        </ul>
+        <div className="flex items-center justify-end gap-2">
           <ThemeToggle />
+          <Link href="/login" className="btn btn-primary hidden sm:inline-flex">
+            Sign in
+          </Link>
+          <MobileNav />
         </div>
       </nav>
     </header>

@@ -3,6 +3,7 @@ export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 export const REPO_URL = "https://github.com/ashiksharonm/verdict";
+export const HF_URL = "https://huggingface.co/convaiinnovations/laya";
 export const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 export const CHECKS = ["pii", "toxicity", "prompt_injection", "grounded"] as const;

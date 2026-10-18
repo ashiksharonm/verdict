@@ -5,8 +5,9 @@ export const metadata: Metadata = { title: "Dashboard" };
 
 export default function Page() {
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+    <div>
+      <p className="eyebrow">Account</p>
+      <h1 className="display mb-10 mt-3">Dashboard</h1>
       <Dashboard />
     </div>
   );
