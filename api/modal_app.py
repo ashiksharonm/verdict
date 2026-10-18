@@ -12,16 +12,20 @@ from __future__ import annotations
 import modal
 
 MODEL_REPO = "ashiksharon005/verdict-laya"
+# Pinned Hub commit (fp32 ONNX added). Bump deliberately; the image rebuilds when this changes.
+MODEL_REVISION = "5a21230f3fed391f25a78af65d538ae459a8d632"
+# fp32 on x86: the int8 graph saturates or loses accuracy on Modal's CPUs (evals/results/2026-10-18-x86-*).
+ONNX_FILE = "onnx/model.onnx"
 HF_HOME = "/opt/hf"
 # Same files the API's own loader asks for (api/verdict_api/model.py HUB_PATTERNS).
-HUB_PATTERNS = ["rl_agent_config.json", "tokenizer/*", "encoder/config.json", "onnx/model.int8.onnx",
+HUB_PATTERNS = ["rl_agent_config.json", "tokenizer/*", "encoder/config.json", ONNX_FILE,
                 "verdict_calibration.json", "questions.json"]
 
 
 def download_model() -> None:
     from huggingface_hub import snapshot_download
 
-    snapshot_download(MODEL_REPO, allow_patterns=HUB_PATTERNS)
+    snapshot_download(MODEL_REPO, revision=MODEL_REVISION, allow_patterns=HUB_PATTERNS)
 
 
 image = (
@@ -35,7 +39,10 @@ image = (
         "HF_HUB_OFFLINE": "1",  # serve the baked-in snapshot; never fetch at request time
         "PYTHONPATH": "/app/api:/app/training",
         "TOKENIZERS_PARALLELISM": "false",
-        "OMP_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "4",
+        "VERDICT_ORT_THREADS": "4",  # 2 physical cores = 4 vCPU; Modal overrides OMP_NUM_THREADS
+        "VERDICT_ONNX_FILE": ONNX_FILE,
+        "VERDICT_MODEL_REVISION": MODEL_REVISION,
     })
     .add_local_dir("api/verdict_api", "/app/api/verdict_api", ignore=["__pycache__"])
     .add_local_file("training/verdict_train/__init__.py", "/app/training/verdict_train/__init__.py")
@@ -46,19 +53,33 @@ image = (
 app = modal.App("verdict-api")
 
 
-@app.function(
+@app.cls(
     image=image,
     secrets=[modal.Secret.from_name("verdict-api")],
-    cpu=1.0,  # one physical core (2 vCPU)
-    memory=2048,
+    cpu=2.0,  # two physical cores (4 vCPU): fp32 needs the headroom
+    memory=4096,  # fp32 graph is 1.7 GB
     min_containers=0,  # scale to zero when idle; the first request after that is a cold start
     max_containers=2,  # hard cap on spend
     scaledown_window=120,  # short idle window: the free tier is $1/month without a card
     timeout=60,
 )
 @modal.concurrent(max_inputs=16)
-@modal.asgi_app(label="verdict-api")
-def api():
-    from verdict_api.app import app_factory
+class Api:
+    @modal.enter()
+    def load(self) -> None:
+        """Load and self-test the model before Modal routes any request to this container.
 
-    return app_factory()
+        A self-test failure raises, so the container never serves and Modal starts another one.
+        """
+        from verdict_api.app import create_app
+        from verdict_api.config import Settings
+        from verdict_api.model import ModelService
+
+        settings = Settings.from_env()
+        self.model = ModelService(settings)
+        self.model.load(strict=True)
+        self.web_app = create_app(settings, model=self.model)
+
+    @modal.asgi_app(label="verdict-api")
+    def web(self):
+        return self.web_app

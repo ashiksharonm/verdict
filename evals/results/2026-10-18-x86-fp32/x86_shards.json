@@ -1,0 +1,69 @@
+{
+  "onnx": "artifacts/onnx/model.onnx",
+  "shards": [
+    {
+      "cpu": {
+        "vendor": "AuthenticAMD",
+        "vnni": false
+      },
+      "items": 807,
+      "seconds": 971.4
+    },
+    {
+      "cpu": {
+        "vendor": "AuthenticAMD",
+        "vnni": false
+      },
+      "items": 806,
+      "seconds": 799.7
+    },
+    {
+      "cpu": {
+        "vendor": "AuthenticAMD",
+        "vnni": false
+      },
+      "items": 806,
+      "seconds": 889.8
+    },
+    {
+      "cpu": {
+        "vendor": "AuthenticAMD",
+        "vnni": false
+      },
+      "items": 806,
+      "seconds": 911.5
+    },
+    {
+      "cpu": {
+        "vendor": "AuthenticAMD",
+        "vnni": false
+      },
+      "items": 806,
+      "seconds": 847.5
+    },
+    {
+      "cpu": {
+        "vendor": "GenuineIntel",
+        "vnni": true
+      },
+      "items": 806,
+      "seconds": 815.8
+    },
+    {
+      "cpu": {
+        "vendor": "AuthenticAMD",
+        "vnni": false
+      },
+      "items": 806,
+      "seconds": 879.4
+    },
+    {
+      "cpu": {
+        "vendor": "AuthenticAMD",
+        "vnni": false
+      },
+      "items": 806,
+      "seconds": 925.6
+    }
+  ]
+}
