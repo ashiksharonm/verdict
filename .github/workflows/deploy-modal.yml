@@ -1,0 +1,69 @@
+name: deploy-modal
+
+on:
+  push:
+    branches: [main]
+    paths: ["api/**", "training/verdict_train/scoring.py", "training/verdict_train/checks.py", ".github/workflows/deploy-modal.yml"]
+  workflow_dispatch:
+
+concurrency: deploy-modal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Skip without Modal credentials
+        id: gate
+        run: |
+          if [ -z "$MODAL_TOKEN_ID" ] || [ -z "$MODAL_TOKEN_SECRET" ]; then
+            echo "::warning::MODAL_TOKEN_ID / MODAL_TOKEN_SECRET not set; skipping deploy"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.gate.outputs.run == 'true'
+        run: pip install "modal==1.6.1"
+      - name: Sync runtime secret
+        if: steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          ALLOWED_ORIGINS: ${{ vars.ALLOWED_ORIGINS || 'http://localhost:3000,https://*.vercel.app' }}
+        run: |
+          modal secret create verdict-api --force \
+            SUPABASE_URL="$SUPABASE_URL" \
+            SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY" \
+            UPSTASH_REDIS_REST_URL="$UPSTASH_REDIS_REST_URL" \
+            UPSTASH_REDIS_REST_TOKEN="$UPSTASH_REDIS_REST_TOKEN" \
+            TURNSTILE_SECRET_KEY="$TURNSTILE_SECRET_KEY" \
+            ALLOWED_ORIGINS="$ALLOWED_ORIGINS" > /dev/null
+      - name: Deploy
+        if: steps.gate.outputs.run == 'true'
+        run: modal deploy api/modal_app.py | tee deploy.log
+      - name: Wait for the model to load
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          url=$(grep -oE 'https://[a-z0-9-]+--verdict-api\.modal\.run' deploy.log | head -1)
+          [ -n "$url" ] || { echo "could not find the endpoint URL in the deploy log"; exit 1; }
+          echo "API: $url" >> "$GITHUB_STEP_SUMMARY"
+          start=$(date +%s)
+          for i in $(seq 1 60); do
+            if curl -fsS --max-time 20 "$url/readyz" | grep -q '"ready": *true'; then
+              echo "ready after $(( $(date +%s) - start )) s (includes cold start)" | tee -a "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "API did not report ready within 10 min"; exit 1

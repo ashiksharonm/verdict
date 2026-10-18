@@ -1,9 +1,8 @@
-name: deploy-api
+name: deploy-api-hf-space
 
+# Manual only: free cpu-basic Docker Spaces now need HF PRO (HTTP 402). The API deploys to Modal
+# (deploy-modal.yml); this stays for when a Space host is available.
 on:
-  push:
-    branches: [main]
-    paths: ["api/**", "training/verdict_train/scoring.py", "training/verdict_train/checks.py", "scripts/deploy_space.py"]
   workflow_dispatch:
 
 concurrency: deploy-api
