@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import AccountMenu from "./AccountMenu";
 import MobileNav from "./MobileNav";
 import ThemeToggle from "./ThemeToggle";
 import { REPO_URL } from "@/lib/config";
@@ -34,9 +35,7 @@ export default function Nav() {
         </ul>
         <div className="flex items-center justify-end gap-2">
           <ThemeToggle />
-          <Link href="/login" className="btn btn-primary hidden sm:inline-flex">
-            Sign in
-          </Link>
+          <AccountMenu />
           <MobileNav />
         </div>
       </nav>

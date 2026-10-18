@@ -119,11 +119,14 @@ export async function playgroundCheck(req: CheckRequest, opts: PlaygroundOptions
 
 export type ApiKey = { id: string; prefix: string; name: string; created_at: string; last_used_at?: string | null; revoked_at?: string | null };
 export type NewApiKey = ApiKey & { key: string };
-export type Usage = { days: { day: string; count: number }[]; month_total: number; monthly_quota: number };
+export type KeyUsage = { id: string; name: string; prefix: string; month_count: number; quota: number };
+export type Usage = { month: string; days: { day: string; count: number }[]; month_total: number; monthly_quota: number; keys: KeyUsage[] };
 
 /** GET /v1/usage returns the monthly limit as `quota`; normalise so the dashboard never reads undefined. */
 export function normaliseUsage(raw: Partial<Usage> & { quota?: number }): Usage {
   return {
+    month: typeof raw.month === "string" ? raw.month : "",
+    keys: Array.isArray(raw.keys) ? raw.keys : [],
     days: Array.isArray(raw.days) ? raw.days : [],
     month_total: Number(raw.month_total ?? 0),
     monthly_quota: Number(raw.monthly_quota ?? raw.quota ?? 0),
