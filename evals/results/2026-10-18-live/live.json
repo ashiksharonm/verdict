@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-18",
+  "endpoint": "https://ashiksharonm--verdict-api.us-east.modal.run",
+  "model_version": "verdict-laya@5a21230f-fp32",
+  "host": "Modal CPU, 2 physical cores (4 vCPU), 4 GB RAM, us-east; ONNX Runtime fp32",
+  "client": "Chennai, India (home broadband)",
+  "e2e": {
+    "script": "evals/x86/e2e_live.py",
+    "log": "e2e.log",
+    "result": "RESULT: 21 passed, 0 failed []"
+  },
+  "latency_ms": {
+    "request": "POST /v1/check, default checks (pii, toxicity, prompt_injection), short text, uncached, sequential, warm container",
+    "n": 20,
+    "server_p50": 959,
+    "server_p95": 997,
+    "round_trip_p50": 1740,
+    "round_trip_p95": 1979
+  },
+  "cold_start": {
+    "model_load_s": 12.3,
+    "note": "model load and self-test; container start comes on top. Happens after 2 min idle."
+  },
+  "x86_accuracy": {
+    "pii": {
+      "macro_f1": 0.988,
+      "decisions_equal_benchmark": 1.0
+    },
+    "toxicity": {
+      "macro_f1": 0.898,
+      "decisions_equal_benchmark": 1.0
+    },
+    "prompt_injection": {
+      "macro_f1": 0.972,
+      "decisions_equal_benchmark": 1.0
+    },
+    "grounded": {
+      "macro_f1": 0.687,
+      "decisions_equal_benchmark": 1.0
+    }
+  }
+}
