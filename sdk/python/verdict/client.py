@@ -12,7 +12,7 @@ import httpx
 from .errors import AuthError, InvalidRequest, RateLimitError, VerdictError
 from .models import CheckResult
 
-DEFAULT_BASE_URL = "https://ashiksharon005-verdict-api.hf.space"
+DEFAULT_BASE_URL = "https://ashiksharonm--verdict-api.us-east.modal.run"
 RETRY_STATUS = {429, 502, 503, 504}
 
 

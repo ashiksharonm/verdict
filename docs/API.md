@@ -1,6 +1,6 @@
 # Verdict API
 
-Base URL: `https://ashiksharon005-verdict-api.hf.space` (free Hugging Face Space; it sleeps when idle, so the first
+Base URL: `https://ashiksharonm--verdict-api.us-east.modal.run` (Modal, CPU; it scales to zero when idle, so the first
 call after a long pause can take a minute). OpenAPI: `GET /openapi.json`, Swagger UI at `/docs`.
 
 All errors are JSON: `{"error": {"code": "<machine_code>", "message": "<text>"}}`. Every response carries

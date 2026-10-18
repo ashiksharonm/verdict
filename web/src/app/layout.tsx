@@ -41,11 +41,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <ul className="flex flex-wrap gap-x-8 gap-y-2">
               <li><a className="link inline-flex items-center gap-0.5" href={REPO_URL}>GitHub repository <ArrowUpRight aria-hidden className="size-3.5" /></a></li>
-              <li><a className="link inline-flex items-center gap-0.5" href={HF_URL}>Laya base model on Hugging Face <ArrowUpRight aria-hidden className="size-3.5" /></a></li>
-              <li><a className="link" href={`${REPO_URL}/blob/main/LICENSE`}>MIT licence</a></li>
+              <li><a className="link inline-flex items-center gap-0.5" href="https://huggingface.co/ashiksharon005/verdict-laya">Verdict model on Hugging Face <ArrowUpRight aria-hidden className="size-3.5" /></a></li>
+              <li><a className="link inline-flex items-center gap-0.5" href={HF_URL}>Laya base model <ArrowUpRight aria-hidden className="size-3.5" /></a></li>
+              <li><a className="link" href={`${REPO_URL}/blob/main/LICENSE`}>MIT licence (code)</a></li>
             </ul>
           </div>
-          <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted sm:px-6">Code is MIT-licensed. Datasets and base models keep their own licences.</p>
+          <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted sm:px-6">Code is MIT-licensed; the fine-tuned model is Apache-2.0. Datasets and the base model keep their own licences.</p>
         </footer>
         </ToastProvider>
       </body>
