@@ -49,8 +49,8 @@ the next request waits for a container start plus a 12 s model load and self-tes
 The API serves the **fp32** ONNX graph. On Modal's x86 CPUs it reproduces the benchmark exactly:
 100% of decisions on all 6,449 held-out items match ([report](evals/results/2026-10-18-x86-fp32/x86_report.md)).
 The int8 export is for Apple silicon only: on x86 CPUs without VNNI its u8s8 products saturate and
-every score collapses to about 0.5, and re-quantising with `reduce_range` still costs 3–7 macro-F1
-points ([report](evals/results/2026-10-18-x86-int8-reduce-range/x86_report.md)). Each container
+every score collapses to about 0.5, and re-quantising with `reduce_range` still costs macro-F1 on three of four checks
+(pii 0.988 → 0.945, toxicity 0.898 → 0.873, prompt_injection 0.972 → 0.940) ([report](evals/results/2026-10-18-x86-int8-reduce-range/x86_report.md)). Each container
 self-tests the model on known cases at start-up and refuses to serve if it gets them wrong.
 
 Limitations: `grounded` is the weakest check (0.69 macro-F1; RAGTruth contexts are often longer than
