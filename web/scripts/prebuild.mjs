@@ -53,5 +53,25 @@ for (const line of readFileSync(join(repo, "evals", "configs", "pricing.yaml"), 
   }
 }
 writeFileSync(join(out, "pricing.json"), JSON.stringify({ references: refs }, null, 2));
+// Live API measurements and x86 parity runs (newest *-live dir wins).
+const liveDirs = readdirSync(resultsRoot, { withFileTypes: true })
+  .filter((d) => d.isDirectory() && d.name.endsWith("-live") && existsSync(join(resultsRoot, d.name, "live.json")))
+  .map((d) => d.name)
+  .sort();
+const need = (name, from) => {
+  if (!from || !existsSync(from)) {
+    console.error(`prebuild: missing ${name} under evals/results`);
+    process.exit(1);
+  }
+};
+const liveSrc = liveDirs.length ? join(resultsRoot, liveDirs[liveDirs.length - 1], "live.json") : null;
+const fp32Src = join(resultsRoot, "2026-10-18-x86-fp32", "x86_metrics.json");
+const int8Src = join(resultsRoot, "2026-10-18-x86-int8-reduce-range", "x86_metrics.json");
+need("*-live/live.json", liveSrc);
+need("2026-10-18-x86-fp32/x86_metrics.json", fp32Src);
+need("2026-10-18-x86-int8-reduce-range/x86_metrics.json", int8Src);
+cpSync(liveSrc, join(out, "live.json"));
+cpSync(fp32Src, join(out, "x86_fp32.json"));
+cpSync(int8Src, join(out, "x86_int8_rr.json"));
 writeFileSync(join(out, "meta.json"), JSON.stringify({ resultsDir: latest }));
 console.log(`prebuild: copied results from evals/results/${latest}`);

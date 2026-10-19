@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import DocLayout from "@/components/DocLayout";
 import Code from "@/components/Code";
 import { API_URL, CHECKS, CHECK_INFO } from "@/lib/config";
+import { live, liveMs } from "@/lib/live";
 import { PRESETS } from "@/lib/presets";
 import { SDK_INSTALL, curlCheck, pythonCheck, sampleResponse } from "@/lib/snippets";
 
@@ -148,7 +149,7 @@ GET  /v1/usage  ->  {"days": [{"day": "2026-10-17", "count": 12}], "month_total"
 
       <h3>Rate limits and errors</h3>
       <p>
-        HTTP 429 carries <code>Retry-After</code> (seconds) and <code>X-RateLimit-*</code> headers; wait that long before retrying. The hosted API runs on a free tier that sleeps when idle, so a cold request can return 502/503 or time out for up to about a minute: retry with backoff.
+        HTTP 429 carries <code>Retry-After</code> (seconds) and <code>X-RateLimit-*</code> headers; wait that long before retrying. The hosted API scales to zero when idle. A cold request pays a model load of about {liveMs.loadS} s plus container start (measured {live.date}, {live.cold_start.note}), so it can be slow or return 502/503: retry with backoff. Warm requests take about {liveMs.p50} ms server-side p50 for 3 checks.
       </p>
 
       <h2 id="quickstart">Quickstart</h2>

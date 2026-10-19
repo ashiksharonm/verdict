@@ -32,7 +32,7 @@ function asCurl(text: string, checks: string[], context?: string) {
 }
 function asPython(text: string, checks: string[], context?: string) {
   const ctx = context ? `, context=${JSON.stringify(context)}` : "";
-  return `from verdict import Client\n\nclient = Client(api_key="vk_...")  # or set VERDICT_API_KEY\nres = client.check(${JSON.stringify(text)}, checks=${JSON.stringify(checks)}${ctx})\nprint(res.results)`;
+  return `from verdict_guardrails import Client\n\nclient = Client(api_key="vk_...")  # or set VERDICT_API_KEY\nres = client.check(${JSON.stringify(text)}, checks=${JSON.stringify(checks)}${ctx})\nprint(res.results)`;
 }
 
 function Tip({ name }: { name: CheckName }) {

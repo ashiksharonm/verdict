@@ -7,12 +7,13 @@ import Code from "@/components/Code";
 import ResultsTable from "@/components/ResultsTable";
 import { CHECKS, CHECK_INFO } from "@/lib/config";
 import { SDK_INSTALL, curlCheck, pythonCheck } from "@/lib/snippets";
+import { liveMs, live } from "@/lib/live";
 import { f3, featured, resultsDir, results } from "@/lib/results";
 
 const steps = [
   ["Your app", "text, optional context, list of checks"],
   ["POST /v1/check", "API key or playground token"],
-  ["One small model", "ONNX int8, one forward pass"],
+  ["One small model", "ONNX, one forward pass"],
   ["Calibrated scores", "per check: flagged, score, threshold"],
 ];
 
@@ -53,7 +54,7 @@ export default function Home() {
             <strong>Toxicity macro-F1 <CountUp value={tox.macro_f1} decimals={3} /></strong> from the same single model, scored per check with its own fitted threshold.
           </li>
           <li>
-            <strong>About <CountUp value={Math.round(lat.p50_ms)} /> ms per request</strong> at p50 (p95 {Math.round(lat.p95_ms)} ms), batch 1, ONNX int8 on {results.environment.machine}.
+            <strong>About <CountUp value={liveMs.p50} /> ms per request</strong> on the live API (3 checks, server-side p50; ~{liveMs.rtP50} ms round trip from India). Measured {live.date} on {live.host}.
           </li>
           {Object.values(judge).every((j) => j.auroc_delta_laya_minus_judge.ci[0] > 0) && (
             <li>
@@ -125,11 +126,11 @@ export default function Home() {
             <Link href="/benchmarks">benchmarks page</Link>.
           </li>
           <li>
-            Latency is around {Math.round(lat.p50_ms)} ms per request (p50, batch 1, ONNX int8 on the benchmark machine&apos;s CPU; p95 {Math.round(lat.p95_ms)} ms). The hosted free CPU tier has not been measured by this benchmark.
+            Live API latency is about {liveMs.p50} ms server-side p50 (p95 {liveMs.p95} ms) for the default 3 checks, ~{liveMs.rtP50} ms round trip from India. The M5 benchmark figure ({Math.round(lat.p50_ms)} ms p50, batch 1, ONNX int8) is on the <Link href="/benchmarks#latency">Benchmarks page</Link> and is not what production serves.
           </li>
           <li>The toxicity test set is class-balanced; real traffic is far less toxic, so production precision will be lower than the table suggests.</li>
           <li>Some PII negatives and the PII positives are synthetic text, so real-world PII performance may differ. See <Link href="/benchmarks#methodology">methodology</Link>.</li>
-          <li>The hosted API runs on a free tier that sleeps when idle: the first request can take up to about a minute. Rate limits apply.</li>
+          <li>After idle the API scales to zero: the first request pays a model load of about {liveMs.loadS} s plus container start. Rate limits apply.</li>
         </ul>
       </Reveal>
     </div>
