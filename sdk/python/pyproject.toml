@@ -35,7 +35,7 @@ dev = ["pytest>=7.4", "pytest-asyncio>=0.23", "pytest-cov>=4.1", "mypy>=1.8", "r
 
 [project.urls]
 Homepage = "https://verdict-sooty-zeta.vercel.app"
-Documentation = "https://github.com/ashiksharonm/verdict/blob/main/docs/SDK.md"
+Documentation = "https://github.com/ashiksharonm/verdict/blob/main/sdk/python/README.md"
 Source = "https://github.com/ashiksharonm/verdict/tree/main/sdk/python"
 Issues = "https://github.com/ashiksharonm/verdict/issues"
 Changelog = "https://github.com/ashiksharonm/verdict/blob/main/sdk/python/CHANGELOG.md"

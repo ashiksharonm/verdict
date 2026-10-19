@@ -35,5 +35,5 @@ ignore = ["E501"]  # long f-strings in report tables; formatting is not enforced
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "api/tests", "sdk/python/tests"]
-pythonpath = ["api", "training", "evals", "sdk/python"]
+pythonpath = ["api", "training", "evals", "sdk/python/src"]
 asyncio_mode = "auto"
