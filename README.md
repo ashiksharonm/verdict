@@ -11,23 +11,70 @@ into a single multi-check model for:
 | `prompt_injection` | Is this user input an injection or jailbreak attempt? |
 | `grounded` | Is the response supported by the provided context? |
 
-Status: work in progress. Training and benchmark code land first; the API, web app and SDK follow.
+**Live:** [website and playground](https://verdict-sooty-zeta.vercel.app) ·
+[API](https://ashiksharonm--verdict-api.us-east.modal.run/docs) ([reference](docs/API.md)) ·
+[model on Hugging Face](https://huggingface.co/ashiksharon005/verdict-laya) (Apache-2.0)
+
+## Quickstart
+
+Create a free API key on the [dashboard](https://verdict-sooty-zeta.vercel.app/dashboard), then:
+
+```bash
+curl -s https://ashiksharonm--verdict-api.us-east.modal.run/v1/check \
+  -H "Authorization: Bearer $VERDICT_API_KEY" -H "Content-Type: application/json" \
+  -d '{"text": "Call me on +44 7700 900123", "checks": ["pii", "toxicity"]}'
+```
+
+```json
+{"id": "chk_f18d663ebba944b6", "model_version": "verdict-laya@5a21230f-fp32",
+ "results": {"pii": {"flagged": true, "score": 0.9996, "threshold": 0.63},
+             "toxicity": {"flagged": false, "score": 0.0167, "threshold": 0.53}},
+ "latency_ms": 668.76}
+```
+
+(Real response from the live API on 2026-10-19, scores rounded to four places.)
+
+Every score is a calibrated probability; `flagged` applies a per-check threshold chosen on validation
+data. For `grounded`, pass the source in `context`; flagged means the response is *not* supported.
+Free keys get 60 requests/min and 10,000 checks/month.
+
+## Production numbers
+
+Measured against the live API on 2026-10-18 ([`live.json`](evals/results/2026-10-18-live/live.json),
+[log](evals/results/2026-10-18-live/e2e.log), [script](evals/x86/e2e_live.py)): end-to-end checks
+21/21 passed; three default checks take **959 ms server-side (p50, 997 ms p95)** on Modal's
+4-vCPU CPU, 1.74 s round trip from India to us-east. After 2 minutes idle the API scales to zero;
+the next request waits for a container start plus a 12 s model load and self-test.
+
+The API serves the **fp32** ONNX graph. On Modal's x86 CPUs it reproduces the benchmark exactly:
+100% of decisions on all 6,449 held-out items match ([report](evals/results/2026-10-18-x86-fp32/x86_report.md)).
+The int8 export is for Apple silicon only: on x86 CPUs without VNNI its u8s8 products saturate and
+every score collapses to about 0.5, and re-quantising with `reduce_range` still costs macro-F1 on three of four checks
+(pii 0.988 → 0.945, toxicity 0.898 → 0.873, prompt_injection 0.972 → 0.940) ([report](evals/results/2026-10-18-x86-int8-reduce-range/x86_report.md)). Each container
+self-tests the model on known cases at start-up and refuses to serve if it gets them wrong.
+
+Limitations: `grounded` is the weakest check (0.69 macro-F1; RAGTruth contexts are often longer than
+the 512-token input). The toxicity test set is class-balanced, so production precision will be lower.
+English only. A guardrail lowers risk; it does not remove it.
 
 ## Layout
 
 ```
-training/   data prep per check, Laya fine-tune, calibration, ONNX int8 export
-evals/      benchmark harness (`make bench`), dataset licences, committed results
-api/        FastAPI service (docs/API.md; Docker Space deploy via scripts/deploy_space.py)
+training/   data prep per check, Laya fine-tune, calibration, ONNX export (fp32 + int8)
+evals/      benchmark harness (`make bench`), x86 parity + live checks (evals/x86), dataset licences, committed results
+api/        FastAPI service (docs/API.md); deployed to Modal by .github/workflows/deploy-modal.yml (api/modal_app.py)
 web/        Next.js site: landing, playground, docs, benchmarks, dashboard (see web/README.md)
-sdk/python/ Python client `verdict-sdk` (sync + async, retries, CI gate; not on PyPI)
-docs/       use cases and design notes
+sdk/python/ Python client `verdict-guardrails` (sync + async, retries, CI gate); PyPI release pending
+docs/       API reference, use cases and design notes
+supabase/   database schema for API keys and usage
 ```
 
 ## License
 
-MIT for the code in this repository. Datasets and base models keep their own licences; see
+MIT for the code in this repository; the fine-tuned model is Apache-2.0. Datasets and the base model keep their own licences; see
 [`evals/DATASETS.md`](evals/DATASETS.md).
+
+## Benchmark
 
 <!-- results:start -->
 

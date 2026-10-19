@@ -4,6 +4,7 @@ import DocLayout from "@/components/DocLayout";
 import ResultsTable from "@/components/ResultsTable";
 import { CHECKS, CHECK_INFO } from "@/lib/config";
 import { parseDatasetTable } from "@/lib/datasets";
+import { live, liveMs, parity } from "@/lib/live";
 import { FEATURED, aggregateThroughput, costPerMillion, f1, f3, resultsDir, results, scoredSystems } from "@/lib/results";
 
 export const metadata: Metadata = { title: "Benchmarks" };
@@ -14,6 +15,7 @@ const TOC = [
   ...CHECKS.map((c) => ({ id: `h-${c}`, label: c, sub: true })),
   { id: "robustness", label: "Injection robustness" },
   { id: "latency", label: "Latency and throughput" },
+  { id: "parity", label: "Production (x86) parity" },
   { id: "judge", label: "Verdict vs an LLM judge" },
   { id: "cost", label: "Cost per 1M checks" },
   { id: "methodology", label: "Methodology and licences" },
@@ -104,8 +106,8 @@ export default function Page() {
         </table>
       </div>
 
-      <h2 id="latency">Latency and throughput</h2>
-      <p>Batch-1 latency is per request. Throughput is items per second over the benchmark run at the stated batch size. Measured on the machine above, not on the hosted API.</p>
+      <h2 id="latency">Latency and throughput (M5 benchmark)</h2>
+      <p>Batch-1 latency is per request. Throughput is items per second over the benchmark run at the stated batch size. Measured on the benchmark machine above (Apple M5), not on the hosted API. Live API numbers: about {liveMs.p50} ms server-side p50 for 3 checks, see the next section.</p>
       <div className="tbl-wrap">
         <table className="tbl">
           <thead><tr><th>System</th><th>Device</th><th className="num">p50 ms</th><th className="num">p95 ms</th><th className="num">Items/s</th></tr></thead>
@@ -130,6 +132,30 @@ export default function Page() {
         max={Math.max(...lat.map(([, s]) => s.latency_batch1!.p50_ms))}
         rows={lat.map(([k, s]) => ({ label: s.name, value: s.latency_batch1!.p50_ms, highlight: k === FEATURED }))}
       />
+
+      <h2 id="parity">Production (x86) parity</h2>
+      <p>
+        The live API runs on {live.host}. The same test sets were re-scored there ({live.date}) with the fp32 model: macro-F1 is unchanged from the M5 benchmark and every decision matches it. Live API: {liveMs.p50} ms server-side p50 ({liveMs.p95} ms p95) and ~{liveMs.rtP50} ms round trip from {live.client}, {live.latency_ms.n} warm uncached 3-check requests; cold start is a model load of about {liveMs.loadS} s plus container start.
+      </p>
+      <div className="tbl-wrap">
+        <table className="tbl">
+          <thead><tr><th>Check</th><th className="num">fp32 on M5 macro-F1</th><th className="num">fp32 on x86 macro-F1</th><th className="num">% decisions equal to benchmark</th><th className="num">int8 reduce_range on x86 macro-F1</th></tr></thead>
+          <tbody>
+            {parity.map((r) => (
+              <tr key={r.check}>
+                <th scope="row" className="font-normal"><code>{r.check}</code></th>
+                <td className="num">{r.m5Fp32 === null ? "–" : f3(r.m5Fp32)}</td>
+                <td className="num">{f3(r.x86Fp32)}</td>
+                <td className="num">{f1(r.equal * 100)}%</td>
+                <td className="num">{r.int8Rr === null ? "–" : `${f3(r.int8Rr)} (${r.int8Rr - r.x86Fp32 >= 0 ? "+" : "−"}${f1(Math.abs(r.int8Rr - r.x86Fp32) * 100)} pts)`}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Why the API serves fp32: the int8 file is built for CPUs with VNNI-style int8 instructions, such as Apple silicon. On x86 CPUs without VNNI it saturates and scores collapse to about 0.5. The <code>reduce_range</code> workaround avoids that but costs macro-F1 as shown in the last column, so production serves fp32 and int8 is for Apple silicon.
+      </p>
 
       <h2 id="judge">Verdict vs a small LLM judge</h2>
       <p>Same {results.llm_judge_n_per_check}-item subsample per check, judge is Qwen3-1.7B.</p>

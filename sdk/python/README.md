@@ -1,14 +1,14 @@
-# verdict-sdk
+# verdict-guardrails
 
 Python client for the [Verdict API](../../docs/API.md): `pii`, `toxicity`, `prompt_injection` and `grounded` checks
-with calibrated scores. Not published to PyPI yet; install from the repo: `pip install ./sdk/python`.
+with calibrated scores. Not published to PyPI yet; install from the repo: `pip install ./sdk/python` (it will be `pip install verdict-guardrails`).
 
 ```python
-from verdict import Client, assert_checks
+from verdict_guardrails import AsyncClient, Client, assert_checks
 
 client = Client(api_key="vk_...")            # or set VERDICT_API_KEY
 r = client.check("Call me on 415-555-0132", checks=["pii", "toxicity"])
-r["pii"].flagged, r["pii"].score             # True, 0.97
+r["pii"].flagged, r["pii"].score             # (True, 0.9996) on the live API
 
 client.check("Paris is in Italy.", checks=["grounded"], context="Paris is the capital of France.")
 ```

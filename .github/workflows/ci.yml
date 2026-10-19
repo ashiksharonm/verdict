@@ -21,6 +21,25 @@ jobs:
       - name: Tests (data utils, metrics, smoke eval, API and SDK with mocked services)
         run: pytest -q
 
+  sdk:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    defaults:
+      run:
+        working-directory: sdk/python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: mypy
+      - run: pytest --cov
+      - run: python -m build && twine check dist/*
+
   web:
     runs-on: ubuntu-latest
     defaults:
