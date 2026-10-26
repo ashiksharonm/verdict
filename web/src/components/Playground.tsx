@@ -315,7 +315,7 @@ export default function Playground() {
           </fieldset>
 
           {TURNSTILE_SITE_KEY ? (
-            <div ref={widgetEl} aria-label="Cloudflare Turnstile challenge" />
+            <div ref={widgetEl} role="group" aria-label="Cloudflare Turnstile challenge" />
           ) : (
             <p className="text-sm text-signal">Turnstile is not configured (NEXT_PUBLIC_TURNSTILE_SITE_KEY is empty); requests are sent without a token and the API may reject them.</p>
           )}
@@ -324,7 +324,7 @@ export default function Playground() {
             <button type="submit" disabled={busy || needsToken} className="btn btn-primary">
               {busy && <Loader2 aria-hidden className="spin size-4" />}
               {busy ? "Checking..." : "Run checks"}
-              {!busy && <kbd className="hidden font-mono text-xs opacity-70 sm:inline">Ctrl/Cmd+Enter</kbd>}
+              {!busy && <kbd className="hidden font-mono text-xs opacity-80 sm:inline">Ctrl/Cmd+Enter</kbd>}
             </button>
             <CopyButton label="curl command" text={() => asCurl(text, picked, grounded ? context : undefined)}>Copy as curl</CopyButton>
             <CopyButton label="Python snippet" text={() => asPython(text, picked, grounded ? context : undefined)}>Copy as Python</CopyButton>
