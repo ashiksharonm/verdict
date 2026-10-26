@@ -7,7 +7,7 @@ export default function ResultsTable({ compact = false }: { compact?: boolean })
     ? scoredSystems.filter(([k]) => ["laya_ft_int8", "laya_zeroshot", "presidio", "keyword", "nli", "protectai", "llm_judge"].includes(k))
     : scoredSystems;
   return (
-    <div className="tbl-wrap">
+    <div className="tbl-wrap" role="region" tabIndex={0} aria-label="Results">
       <table className="tbl">
         <caption>
           Macro-F1 / AUROC on held-out test sets (n = {CHECKS.map((c) => `${results.test_sizes[c].toLocaleString("en-US")} ${c}`).join(", ")}). Dashes: system does not cover that check. LLM judge scored on a {results.llm_judge_n_per_check}-item subsample per check.{" "}

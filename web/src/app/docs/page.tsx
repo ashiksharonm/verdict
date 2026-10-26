@@ -123,7 +123,7 @@ export default function Page() {
       <p>For <code>flagged</code>: <code>pii</code>, <code>toxicity</code> and <code>prompt_injection</code> flag when the text matches; <code>grounded</code> flags when the response is <em>not</em> supported by the context.</p>
 
       <h2 id="api">API reference</h2>
-      <div className="tbl-wrap">
+      <div className="tbl-wrap" role="region" tabIndex={0} aria-label="API reference">
         <table className="tbl">
           <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
           <tbody>

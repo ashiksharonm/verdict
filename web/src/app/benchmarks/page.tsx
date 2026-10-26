@@ -56,7 +56,7 @@ export default function Page() {
                 return { label: s.name, value: m.macro_f1, lo: m.ci95.macro_f1[0], hi: m.ci95.macro_f1[1], highlight: k === FEATURED };
               })}
             />
-            <div className="tbl-wrap">
+            <div className="tbl-wrap" role="region" tabIndex={0} aria-label={`Scores, `}>
               <table className="tbl">
                 <thead>
                   <tr>
@@ -91,7 +91,7 @@ export default function Page() {
 
       <h2 id="robustness">Prompt-injection robustness</h2>
       <p>Recall on every positive in the injection test set after rewriting it five ways. Higher is better.</p>
-      <div className="tbl-wrap">
+      <div className="tbl-wrap" role="region" tabIndex={0} aria-label="Prompt-injection robustness">
         <table className="tbl">
           <thead><tr><th>System</th><th className="num">Original</th>{ROBUST.map((r) => <th key={r} className="num">{r}</th>)}</tr></thead>
           <tbody>
@@ -108,7 +108,7 @@ export default function Page() {
 
       <h2 id="latency">Latency and throughput (M5 benchmark)</h2>
       <p>Batch-1 latency is per request. Throughput is items per second over the benchmark run at the stated batch size. Measured on the benchmark machine above (Apple M5), not on the hosted API. Live API numbers: about {liveMs.p50} ms server-side p50 for 3 checks, see the next section.</p>
-      <div className="tbl-wrap">
+      <div className="tbl-wrap" role="region" tabIndex={0} aria-label="Latency and throughput">
         <table className="tbl">
           <thead><tr><th>System</th><th>Device</th><th className="num">p50 ms</th><th className="num">p95 ms</th><th className="num">Items/s</th></tr></thead>
           <tbody>
@@ -137,7 +137,7 @@ export default function Page() {
       <p>
         The live API runs on {live.host}. The same test sets were re-scored there ({live.date}) with the fp32 model: macro-F1 is unchanged from the M5 benchmark and every decision matches it. Live API: {liveMs.p50} ms server-side p50 ({liveMs.p95} ms p95) and ~{liveMs.rtP50} ms round trip from {live.client}, {live.latency_ms.n} warm uncached 3-check requests; cold start is a model load of about {liveMs.loadS} s plus container start.
       </p>
-      <div className="tbl-wrap">
+      <div className="tbl-wrap" role="region" tabIndex={0} aria-label="Production parity">
         <table className="tbl">
           <thead><tr><th>Check</th><th className="num">fp32 on M5 macro-F1</th><th className="num">fp32 on x86 macro-F1</th><th className="num">% decisions equal to benchmark</th><th className="num">int8 reduce_range on x86 macro-F1</th></tr></thead>
           <tbody>
@@ -159,7 +159,7 @@ export default function Page() {
 
       <h2 id="judge">Verdict vs a small LLM judge</h2>
       <p>Same {results.llm_judge_n_per_check}-item subsample per check, judge is Qwen3-1.7B.</p>
-      <div className="tbl-wrap">
+      <div className="tbl-wrap" role="region" tabIndex={0} aria-label="Verdict vs LLM judge">
         <table className="tbl">
           <thead><tr><th>Check</th><th className="num">n</th><th className="num">Verdict macro-F1</th><th className="num">AUROC gain over judge [95% CI]</th><th className="num">Cohen&apos;s kappa</th></tr></thead>
           <tbody>
@@ -196,7 +196,7 @@ export default function Page() {
         <li>Toxicity test set is class-balanced; PII data is partly synthetic; <code>grounded</code> uses RAGTruth with the natural label rate.</li>
         <li>Calibration quality is reported as ECE and Brier score (lower is better).</li>
       </ul>
-      <div className="tbl-wrap">
+      <div className="tbl-wrap" role="region" tabIndex={0} aria-label="Datasets">
         <table className="tbl">
           <thead><tr><th>Check</th><th>Source</th><th>Licence</th><th>Used for</th></tr></thead>
           <tbody>
@@ -214,7 +214,7 @@ function BySource({ check }: { check: "prompt_injection" | "grounded" }) {
   const rows = scoredSystems.filter(([, s]) => s.checks?.[check]?.by_source);
   const cols = Object.keys(rows[0][1].checks![check]!.by_source!);
   return (
-    <div className="tbl-wrap">
+    <div className="tbl-wrap" role="region" tabIndex={0} aria-label={`By source, `}>
       <table className="tbl">
         <caption>Macro-F1 by source dataset, {check}</caption>
         <thead><tr><th>System</th>{cols.map((c) => <th key={c} className="num">{c} (n={rows[0][1].checks![check]!.by_source![c].n})</th>)}</tr></thead>

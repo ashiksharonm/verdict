@@ -179,7 +179,7 @@ function Authed({ token, email, onSignOut }: { token: string; email: string; onS
             <button type="button" className="btn btn-primary mt-4" onClick={() => nameRef.current?.focus()}>Name your key</button>
           </div>
         ) : (
-          <div className="tbl-wrap">
+          <div className="tbl-wrap" role="region" tabIndex={0} aria-label="API keys">
             <table className="tbl">
               <thead><tr><th>Name</th><th>Prefix</th><th>Created</th><th><span className="sr-only">Actions</span></th></tr></thead>
               <tbody>
@@ -276,7 +276,7 @@ function UsageSection({ usage, series, now, activeKeys }: { usage: Usage; series
         <UsageChart days={series} />
         <details className="mt-3 text-sm">
           <summary className="cursor-pointer">Data table</summary>
-          <div className="tbl-wrap mt-2 max-h-72 overflow-y-auto">
+          <div className="tbl-wrap mt-2 max-h-72 overflow-y-auto" role="region" tabIndex={0} aria-label="Checks per day">
             <table className="tbl">
               <thead><tr><th>Day</th><th className="num">Checks</th></tr></thead>
               <tbody>{[...series].reverse().map((d) => <tr key={d.day}><td>{d.day}</td><td className="num">{nf(d.count)}</td></tr>)}</tbody>
@@ -286,7 +286,7 @@ function UsageSection({ usage, series, now, activeKeys }: { usage: Usage; series
       </figure>
 
       {usage.keys.length > 0 && (
-        <div className="tbl-wrap">
+        <div className="tbl-wrap" role="region" tabIndex={0} aria-label="Usage per key">
           <table className="tbl">
             <caption className="sr-only">Usage per key this month</caption>
             <thead><tr><th>Key</th><th>Prefix</th><th className="num">This month</th><th>% of quota</th></tr></thead>
